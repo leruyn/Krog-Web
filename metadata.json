@@ -1,0 +1,6 @@
+{
+  "name": "Krog Việt Nam",
+  "description": "Ứng dụng chiêm nghiệm cổ xưa và đập đá giải sầu cùng người tiền sử Krog",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
