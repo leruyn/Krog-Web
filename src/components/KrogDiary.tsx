@@ -69,10 +69,10 @@ export default function KrogDiary() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#f4f1ea] p-4 text-[#2a2521] select-none justify-between overflow-y-auto">
+    <div className="flex flex-col h-full bg-[#0f0d0b] p-4 text-[#ede5d8] select-none justify-between rounded-2xl border border-[#d4943a]/8">
       <div>
         <div className="flex justify-between items-center mb-1">
-          <h3 className="font-mono text-sm uppercase tracking-wider text-amber-900 font-bold flex items-center">
+          <h3 className="font-mono text-xs uppercase tracking-wider text-[#d4943a] font-bold flex items-center">
             <Feather className="w-4 h-4 mr-1.5 stroke-2" /> Nhật Ký Vách Đá
           </h3>
           <button
@@ -80,33 +80,34 @@ export default function KrogDiary() {
               playWoodClickSound();
               setShowHelper(!showHelper);
             }}
-            className="text-amber-800 hover:text-amber-950 p-1 rounded-full cursor-pointer transition-all"
+            type="button"
+            className="text-[#9a8d7e] hover:text-[#ede5d8] p-1 rounded-full cursor-pointer transition-all"
             title="Từ điển Krog"
           >
-            <HelpCircle className="w-4 h-4" />
+            <HelpCircle className="w-4.5 h-4.5" />
           </button>
         </div>
-        <p className="text-[11px] text-amber-800 font-sans italic mb-3">
+        <p className="text-[10px] text-[#9a8d7e] font-serif italic mb-3">
           Trút nỗi niềm văn phòng. Đá ma thuật tự dịch sang tiếng nguyên thuỷ...
         </p>
 
         {/* Dictionary Guide help panel */}
         {showHelper && (
-          <div className="bg-amber-100/60 rounded-xl p-3 border border-amber-950/15 mb-3 text-[11px] font-mono leading-relaxed text-amber-950 animate-fade-in">
-            <p className="font-bold border-b border-amber-900/10 pb-1 mb-1 text-amber-900">🪨 DANH TỪ CỔ KHUYÊN DÙNG:</p>
-            <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+          <div className="bg-[#1c1915] rounded-xl p-3 border border-[#d4943a]/12 mb-3 text-[10px] font-mono leading-relaxed text-[#ede5d8] animate-fade-in">
+            <p className="font-bold border-b border-[#d4943a]/8 pb-1 mb-1 text-[#d4943a]">🪨 DANH TỪ CỔ KHUYÊN DÙNG:</p>
+            <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
               <div>• đi làm, làm việc</div>
-              <div className="text-amber-800">→ săn bắn, bẩy đá</div>
+              <div className="text-[#d4943a]">→ săn bắn, bẩy đá</div>
               <div>• lương, tiền</div>
-              <div className="text-amber-800">→ vỏ sò</div>
+              <div className="text-[#d4943a]">→ vỏ sò</div>
               <div>• sếp, quản lý</div>
-              <div className="text-amber-800">→ tộc trưởng</div>
+              <div className="text-[#d4943a]">→ tộc trưởng</div>
               <div>• deadline</div>
-              <div className="text-amber-800">→ thú dữ đuổi dồn dập</div>
+              <div className="text-[#d4943a]">→ thú dữ đuổi dồn dập</div>
               <div>• stress, mệt</div>
-              <div className="text-amber-800">→ đầu bốc khói, lưng mỏi</div>
+              <div className="text-[#d4943a]">→ đầu bốc khói, lưng mỏi</div>
               <div>• máy tính, điện thoại</div>
-              <div className="text-amber-800">→ phiến đá phát sáng</div>
+              <div className="text-[#d4943a]">→ phiến đá phát sáng</div>
             </div>
           </div>
         )}
@@ -118,55 +119,56 @@ export default function KrogDiary() {
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Hôm nay đi làm gặp sếp giục deadline stress mệt..."
-            className="flex-1 text-xs px-3 py-2.5 rounded-lg bg-amber-50/50 border border-amber-950/20 text-[#2a2521] placeholder-amber-900/35 focus:outline-hidden focus:border-amber-900 focus:bg-amber-50/90 font-sans"
+            className="flex-1 text-xs px-3 py-2 rounded-lg bg-[#1c1915] border border-[#d4943a]/12 text-[#ede5d8] placeholder-[#9a8d7e]/40 focus:outline-hidden focus:border-[#d4943a] focus:bg-[#1c1915]/90 font-sans"
             maxLength={140}
           />
           <button
             type="submit"
             disabled={!inputText.trim()}
-            className="bg-amber-900 disabled:opacity-40 text-amber-50 px-3 py-2 rounded-lg font-mono text-xs cursor-pointer font-bold transition-all hover:bg-amber-950 flex items-center shrink-0"
+            className="bg-[#d4943a] text-[#0c0a08] disabled:opacity-30 px-3.5 py-2 rounded-lg font-mono text-xs cursor-pointer font-bold transition-all hover:bg-[#e8a838] flex items-center shrink-0"
           >
             Khắc Đá 🪓
           </button>
         </form>
 
         {/* List of previously carved stones */}
-        <div className="space-y-3.5 max-h-[220px] overflow-y-auto pr-1">
-          <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-900/70">
+        <div className="space-y-2.5 max-h-[190px] overflow-y-auto pr-1">
+          <div className="flex items-center gap-1.5 text-[9px] font-mono font-bold uppercase tracking-wider text-[#9a8d7e]">
             <History className="w-3.5 h-3.5" /> Lịch sử bia đá
           </div>
 
           {diaries.length === 0 ? (
-            <div className="text-center py-6 text-[11px] font-mono italic text-amber-800/40">
+            <div className="text-center py-6 text-[10px] font-mono italic text-[#9a8d7e]/40">
               Vách đá nhẵn thín. Chưa ghi khắc điều chi.
             </div>
           ) : (
             diaries.map((diary) => (
               <div
                 key={diary.id}
-                className="bg-amber-100/30 rounded-xl p-3 border border-amber-950/10 relative group hover:bg-amber-100/50 transition-colors"
+                className="bg-[#151210] rounded-xl p-3 border border-[#d4943a]/8 relative group hover:border-[#d4943a]/20 transition-all duration-200"
                 style={{
-                  backgroundImage: 'radial-gradient(ellipse at bottom, rgba(160,110,60,0.02) 0%, transparent 100%)'
+                  backgroundImage: 'radial-gradient(ellipse at bottom, rgba(212,148,58,0.01) 0%, transparent 100%)'
                 }}
               >
-                <div className="flex justify-between items-center mb-1 border-b border-dashed border-amber-950/5 pb-1">
-                  <span className="text-[9px] font-mono font-bold text-amber-800">
+                <div className="flex justify-between items-center mb-1 border-b border-dashed border-[#d4943a]/5 pb-1">
+                  <span className="text-[8px] font-mono font-bold text-[#d4943a]">
                     🦕 {diary.timestamp}
                   </span>
                   <button
                     onClick={() => handleDelete(diary.id)}
-                    className="text-amber-900/40 hover:text-red-700 cursor-pointer p-0.5 rounded transition-all"
+                    type="button"
+                    className="text-[#9a8d7e]/40 hover:text-red-400 cursor-pointer p-0.5 rounded transition-all"
                     title="Xóa bia đá"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
-                <p className="text-xs font-serif leading-relaxed text-[#2c2621]">
+                <p className="text-xs font-serif leading-relaxed text-[#ede5d8]/90">
                   "{diary.krogText}"
                 </p>
 
-                <p className="text-[10px] text-amber-950/40 font-mono mt-1.5 border-t border-amber-950/5 pt-1 truncate">
+                <p className="text-[9px] text-[#9a8d7e]/50 font-mono mt-1.5 border-t border-[#d4943a]/5 pt-1 truncate">
                   Gốc: {diary.originalText}
                 </p>
               </div>
@@ -175,7 +177,7 @@ export default function KrogDiary() {
         </div>
       </div>
 
-      <div className="text-center text-[9px] font-mono text-amber-900/70 border-t border-amber-950/5 pt-2.5 mt-2 select-none">
+      <div className="text-center text-[8px] font-mono text-[#9a8d7e]/50 border-t border-[#d4943a]/5 pt-2 mt-2 select-none">
         Mọi nhật ký được khắc chìm hoàn toàn vào bộ nhớ cục bộ trình duyệt.
       </div>
     </div>

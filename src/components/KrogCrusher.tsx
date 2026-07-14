@@ -37,21 +37,20 @@ export default function KrogCrusher({
   setPurchasedIds,
 }: KrogCrusherProps) {
   const [activeSubView, setActiveSubView] = useState<'smash' | 'shop'>('smash');
-
-  const [activeFace, setActiveFace] = useState<'normal' | 'cracked' | 'broken'>('normal');
   const [crackSeverity, setCrackSeverity] = useState<number>(0);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [floatTexts, setFloatTexts] = useState<FloatText[]>([]);
   const [isHitting, setIsHitting] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const expressions = [
     'Oải lắm! Đập thêm!',
-    'Hả giáp! Rầm!',
+    'Hả giáp! Rầm! 🪓',
     'Sếp la krog? Bốp!',
-    'Yêu đơn phương? Cút!',
+    'Yêu đơn phương? Cút! 💔',
     'Rời phố về hang đập đá!',
     'Đá mẻ rồi, đập mạnh!',
-    'Tránh ra, krog đang điên!'
+    'Xua tan mệt mỏi! Bốp!'
   ];
 
   const shopItems = [
@@ -103,7 +102,7 @@ export default function KrogCrusher({
     {
       id: 'roasted_mammoth',
       name: 'Thịt Voi Ma Mút',
-      desc: 'Hương vị béo ngậy nướng lá dâu rừng thơm phức sưởi ấm bụng đói Krog suốt mùa tuyết rơi.',
+      desc: 'Hương vị béo ngậy nướng lá dâu rừng thơm phức sưởi ấm bụng đói Krog.',
       stoneCost: 30,
       shellCost: 2,
       emoji: '🍖',
@@ -121,7 +120,7 @@ export default function KrogCrusher({
     {
       id: 'funny_dino',
       name: 'Bé Khủng Long T-Rex Éc Éc',
-      desc: 'Một quả trứng nứt ra chú T-Rex siêu dễ thương đi loanh quanh hú ré động viên Krog.',
+      desc: 'Một quả trứng nứt ra chú T-Rex dễ thương đi loanh quanh hú ré động viên Krog.',
       stoneCost: 110,
       shellCost: 8,
       emoji: '🦖',
@@ -137,30 +136,12 @@ export default function KrogCrusher({
       type: 'badge' as const,
     },
     {
-      id: 'vip_cave_cert',
-      name: 'Sổ Đỏ Hang VIP',
-      desc: 'Chủ sở hữu danh giá hang đá độc quyền có cách âm chống bão dông hú gió bấc.',
-      stoneCost: 150,
-      shellCost: 15,
-      emoji: '🌋',
-      type: 'badge' as const,
-    },
-    {
       id: 'ancient_paint',
       name: 'Cọ Vẽ Vẽ Bậy Tổ Tiên',
-      desc: 'Nhựa quả mâm xôi để nguệch ngoạc hổ báo bờm ngựa lên vách hang xả trét hết sẩy.',
+      desc: 'Nhựa quả mâm xôi để nguệch ngoạc sắc màu huyền ảo lên vách hang xả trét.',
       stoneCost: 80,
       shellCost: 4,
       emoji: '🎨',
-      type: 'badge' as const,
-    },
-    {
-      id: 'title_billionaire',
-      name: 'Danh Hiệu Triệu Phú Sò',
-      desc: 'Khiến tộc nhân nể sợ, cúi đầu chào bái và dâng hiến dưa hấu hoang mỗi buổi sáng.',
-      stoneCost: 250,
-      shellCost: 30,
-      emoji: '👑',
       type: 'badge' as const,
     }
   ];
@@ -198,7 +179,7 @@ export default function KrogCrusher({
 
   // Work out multi yields
   let clickMultiplier = 1;
-  let shellChance = 0.3;
+  let shellChance = 0.25;
   let toolLabel = 'Đập tay không (1x)';
   let toolEmoji = '✊';
 
@@ -229,7 +210,6 @@ export default function KrogCrusher({
     toolEmoji = '🥄';
   }
 
-  // Bonus from tribal gong: increase shell chance by 10%
   if (purchasedIds.includes('tribal_gong')) {
     shellChance = Math.min(0.95, shellChance + 0.10);
   }
@@ -240,7 +220,6 @@ export default function KrogCrusher({
     setIsHitting(true);
     setTimeout(() => setIsHitting(false), 90);
 
-    // Increment points
     const clickStones = clickMultiplier;
     const clickShells = Math.random() < shellChance ? 1 : 0;
     setStones((prev) => prev + clickStones);
@@ -248,16 +227,13 @@ export default function KrogCrusher({
       setShells((prev) => prev + clickShells);
     }
 
-    // Capture click coordinate inside relative container
     const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const clickY = e.clientY - rect.top;
 
-    // Generate cracking severity
     setCrackSeverity((prev) => {
       const next = prev + 1;
       if (next >= 12) {
-        // Reset full fracture animation
         setTimeout(() => setCrackSeverity(0), 400);
         return 12;
       }
@@ -274,14 +250,13 @@ export default function KrogCrusher({
         x: clickX,
         y: clickY,
         vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 2, // Upward bias
+        vy: Math.sin(angle) * speed - 2,
         size: 4 + Math.random() * 8,
         rotation: Math.random() * 360,
       });
     }
     setParticles((prev) => [...prev, ...nextParticles]);
 
-    // Floating text
     const funnyText = clickShells > 0 ? `+${clickMultiplier} Đá & +1 Sò! 🐚` : `+${clickMultiplier} Đá Rừng! 🪨`;
     const randomKrogSpeak = expressions[Math.floor(Math.random() * expressions.length)];
     const floatingMsg = Math.random() < 0.45 ? randomKrogSpeak : funnyText;
@@ -300,7 +275,8 @@ export default function KrogCrusher({
   const handleBuy = (id: string, stoneCost: number, shellCost: number) => {
     if (purchasedIds.includes(id)) return;
     if (stones < stoneCost || shells < shellCost) {
-      alert('Krog chưa gom đủ đá núi hoặc vỏ sò lấp lánh rồi!');
+      setErrorMessage('Krog chưa gom đủ đá núi hoặc vỏ sò lấp lánh rồi!');
+      setTimeout(() => setErrorMessage(''), 3000);
       return;
     }
 
@@ -309,12 +285,11 @@ export default function KrogCrusher({
     setShells((prev) => prev - shellCost);
     setPurchasedIds((prev) => [...prev, id]);
 
-    // Show a floating visual response
     setFloatTexts((prev) => [
       ...prev,
       {
         id: Date.now() + Math.random(),
-        x: 150,
+        x: 100,
         y: 100,
         text: `🎉 ĐÃ TẬU ĐỒ MỚI!`,
       },
@@ -332,36 +307,36 @@ export default function KrogCrusher({
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#f4f1ea] p-4 text-[#2a2521] select-none justify-between">
+    <div className="flex flex-col h-full bg-[#0f0d0b] p-4 text-[#ede5d8] select-none rounded-2xl border border-[#d4943a]/8 min-h-[350px] justify-between">
       {/* Pocket counts */}
       <div className="grid grid-cols-2 gap-3 mb-2">
-        <div className="bg-amber-100/40 border border-amber-950/10 rounded-xl p-2.5 flex items-center justify-between">
+        <div className="bg-[#1c1915]/60 border border-[#d4943a]/10 rounded-xl p-2 md:p-2.5 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xl">🪨</span>
             <div className="flex flex-col">
-              <span className="text-[9px] font-mono font-bold tracking-wide text-amber-800 uppercase">Đá lượm được</span>
-              <span className="font-mono text-base font-black text-amber-950 leading-none">{stones}</span>
+              <span className="text-[9px] font-mono font-bold tracking-wide text-[#9a8d7e] uppercase">Đá lượm được</span>
+              <span className="font-mono text-xs md:text-sm font-black text-[#ede5d8] leading-none mt-0.5">{stones}</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-amber-100/40 border border-amber-950/10 rounded-xl p-2.5 flex items-center justify-between">
+        <div className="bg-[#1c1915]/60 border border-[#d4943a]/10 rounded-xl p-2 md:p-2.5 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xl">🐚</span>
             <div className="flex flex-col">
-              <span className="text-[9px] font-mono font-bold tracking-wide text-amber-800 uppercase">Sò quý đổi thịt</span>
-              <span className="font-mono text-base font-black text-amber-950 leading-none">{shells}</span>
+              <span className="text-[9px] font-mono font-bold tracking-wide text-[#9a8d7e] uppercase">Sò đổi bảo bối</span>
+              <span className="font-mono text-xs md:text-sm font-black text-[#ede5d8] leading-none mt-0.5">{shells}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Toggle View Buttons */}
-      <div className="flex border border-amber-950/10 rounded-lg p-0.5 bg-amber-50/50 my-1 justify-between text-xs font-mono font-bold">
+      <div className="flex border border-[#d4943a]/8 rounded-lg p-0.5 bg-[#151210] my-1 justify-between text-xs font-mono font-bold">
         <button
           onClick={() => { playWoodClickSound(); setActiveSubView('smash'); }}
           className={`flex-1 py-1 rounded-md text-center transition-all cursor-pointer ${
-            activeSubView === 'smash' ? 'bg-amber-900 text-[#f4f1ea]' : 'text-amber-900/60 hover:text-amber-900'
+            activeSubView === 'smash' ? 'bg-[#d4943a] text-[#0c0a08]' : 'text-[#9a8d7e] hover:text-[#ede5d8]'
           }`}
         >
           🪨 Đập Đá Ngày Đêm
@@ -369,12 +344,12 @@ export default function KrogCrusher({
         <button
           onClick={() => { playWoodClickSound(); setActiveSubView('shop'); }}
           className={`flex-1 py-1 rounded-md text-center transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-            activeSubView === 'shop' ? 'bg-amber-900 text-[#f4f1ea]' : 'text-amber-900/60 hover:text-amber-900'
+            activeSubView === 'shop' ? 'bg-[#d4943a] text-[#0c0a08]' : 'text-[#9a8d7e] hover:text-[#ede5d8]'
           }`}
         >
           🏪 Tiệm Đồ Oog-Ruk
           {purchasedIds.length > 0 && (
-            <span className="bg-orange-600 text-white text-[8px] font-bold px-1.5 py-0.2 rounded-full">
+            <span className="bg-red-600 text-white text-[8px] font-bold px-1.5 py-0.2 rounded-full">
               {purchasedIds.length}
             </span>
           )}
@@ -384,45 +359,41 @@ export default function KrogCrusher({
       {activeSubView === 'smash' ? (
         <>
           {/* Main Interactive Rock */}
-          <div className="flex-1 flex flex-col items-center justify-center relative my-2">
-            <p className="text-center font-mono text-[9px] uppercase text-amber-800 tracking-wider font-bold mb-2">
-              {clickMultiplier > 1 ? `⚒️ Đang cầm: ${toolLabel}` : 'Chạm liên tục để mài sắc tảng đá xả xì-trét'}
+          <div className="flex-1 flex flex-col items-center justify-center relative my-4 min-h-[160px]">
+            <p className="text-center font-mono text-[9px] uppercase text-[#9a8d7e] tracking-wider font-bold mb-2">
+              {clickMultiplier > 1 ? `⚒️ Đang dùng: ${toolLabel}` : 'Chạm liên tục để đập tảng đá xả xì-trét'}
             </p>
 
             <div
               onClick={handleSmash}
-              className={`w-36 h-36 relative rounded-full flex items-center justify-center cursor-pointer transition-transform duration-75 active:scale-95 ${
+              className={`w-28 h-28 relative rounded-full flex items-center justify-center cursor-pointer transition-transform duration-75 active:scale-95 ${
                 isHitting ? 'scale-90 rotate-1' : 'hover:scale-105'
               }`}
             >
               {/* SVG Stone rendering with dynamic fissures */}
               <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-xl select-none">
-                {/* The Raw Rock Shape */}
                 <polygon
                   points="20,40 30,20 60,15 85,35 90,65 70,85 35,90 12,70"
-                  fill="#7a7065"
-                  stroke="#433b35"
+                  fill="#4a423b"
+                  stroke="#2a2521"
                   strokeWidth="3.5"
                   strokeLinejoin="round"
                 />
-                {/* Rock highlight shading */}
                 <polygon
                   points="30,22 58,18 80,36 50,50"
-                  fill="#a39689"
+                  fill="#73675c"
                   opacity="0.35"
                 />
-                {/* Ambient shadow bottom */}
                 <polygon
                   points="32,87 70,82 85,65 60,65"
-                  fill="#2a2521"
+                  fill="#1c1815"
                   opacity="0.25"
                 />
 
-                {/* Dynamic Crack layers based on clicks */}
                 {crackSeverity > 0 && (
                   <path
                     d="M 50,50 L 30,35 M 50,50 L 70,40"
-                    stroke="#1c1815"
+                    stroke="#110e0c"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                   />
@@ -430,7 +401,7 @@ export default function KrogCrusher({
                 {crackSeverity > 3 && (
                   <path
                     d="M 30,35 L 20,45 M 70,40 L 85,45 M 50,50 L 55,75"
-                    stroke="#1c1815"
+                    stroke="#110e0c"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                   />
@@ -438,7 +409,7 @@ export default function KrogCrusher({
                 {crackSeverity > 6 && (
                   <path
                     d="M 55,75 L 35,85 M 55,75 L 75,82 M 30,35 L 45,20"
-                    stroke="#1c1815"
+                    stroke="#110e0c"
                     strokeWidth="3"
                     strokeLinecap="round"
                   />
@@ -446,15 +417,14 @@ export default function KrogCrusher({
                 {crackSeverity > 9 && (
                   <path
                     d="M 12,70 L 40,50 L 90,65"
-                    stroke="#0e0a08"
+                    stroke="#000000"
                     strokeWidth="4"
                     strokeLinecap="round"
                   />
                 )}
               </svg>
 
-              {/* SVG Sparkle Icon in the middle */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none text-amber-100 flex items-center justify-center font-black font-mono text-lg tracking-wider bg-transparent">
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none text-2xl">
                 {toolEmoji}
               </div>
 
@@ -462,7 +432,7 @@ export default function KrogCrusher({
               {particles.map((p) => (
                 <div
                   key={p.id}
-                  className="absolute bg-[#504840] border border-[#2a2521]"
+                  className="absolute bg-[#5c5249] border border-[#231e1a]"
                   style={{
                     left: p.x,
                     top: p.y,
@@ -480,7 +450,7 @@ export default function KrogCrusher({
               {floatTexts.map((f) => (
                 <div
                   key={f.id}
-                  className="absolute font-mono text-[11px] font-black text-[#5c4a3c] bg-white/90 px-1.5 py-0.5 rounded-md border border-amber-950/20 shadow-xs pointer-events-none whitespace-nowrap animate-float-up animate-none"
+                  className="absolute font-mono text-[9px] font-black text-[#ede5d8] bg-[#1c1915] px-1.5 py-0.5 rounded border border-[#d4943a]/25 shadow-md pointer-events-none whitespace-nowrap animate-float-up"
                   style={{
                     left: f.x - 30,
                     top: f.y - 10,
@@ -494,13 +464,19 @@ export default function KrogCrusher({
         </>
       ) : (
         /* Oog-Ruk Exchange Shop view list */
-        <div className="flex-1 overflow-y-auto max-h-[290px] pr-1 py-1.5 my-1 space-y-2">
-          <div className="bg-orange-100/50 border border-orange-900/10 rounded-xl p-2.5 mb-2">
-            <h5 className="font-mono text-[10px] font-bold uppercase tracking-wider text-orange-950 flex items-center gap-1">
-              ⛺ Bộ Tộc Oog-Ruk Chào Bạn!
+        <div className="flex-1 overflow-y-auto max-h-[190px] pr-1 py-1 my-1 space-y-2">
+          {errorMessage && (
+            <div className="bg-red-950/80 border border-red-500/30 rounded-xl p-2 text-center text-[10px] text-red-200">
+              ⚠️ {errorMessage}
+            </div>
+          )}
+
+          <div className="bg-[#1c1915]/60 border border-[#d4943a]/10 rounded-xl p-2.5">
+            <h5 className="font-mono text-[9px] font-bold uppercase tracking-wider text-[#d4943a] flex items-center gap-1">
+              ⛺ Oog-Ruk Chào Bạn!
             </h5>
-            <p className="text-[10px] text-orange-900/80 leading-normal font-sans mt-0.5">
-              Trao đổi vỏ sò lấp lánh và đá thô lượm trên núi để đổi lấy tư trang cực xịn sưởi ấm hang lạnh.
+            <p className="text-[9.5px] text-[#9a8d7e] leading-normal font-sans mt-0.5">
+              Trao đổi vỏ sò lấp lánh và đá núi lấy tư trang cực xịn sưởi ấm căn hang hoang lạnh.
             </p>
           </div>
 
@@ -514,29 +490,29 @@ export default function KrogCrusher({
                   key={item.id}
                   className={`border rounded-xl p-2 flex items-center justify-between gap-2.5 transition-all ${
                     isPurchased
-                      ? 'bg-amber-100/20 border-amber-950/5 opacity-75'
-                      : 'bg-amber-50/70 border-amber-950/15'
+                      ? 'bg-[#1c1915]/20 border-[#d4943a]/5 opacity-60'
+                      : 'bg-[#151210] border-[#d4943a]/10 hover:border-[#d4943a]/20'
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl bg-[#eae2d5] p-1.5 rounded-xl border border-amber-950/10 flex items-center justify-center">
+                    <span className="text-xl bg-[#1c1915] p-1.5 rounded-xl border border-[#d4943a]/10 flex items-center justify-center">
                       {item.emoji}
                     </span>
                     <div className="flex flex-col">
-                      <span className="text-[10.5px] font-mono font-bold text-amber-950 flex items-center gap-1">
+                      <span className="text-[10px] font-mono font-bold text-[#ede5d8] flex items-center gap-1">
                         {item.name}
                         {isPurchased && (
-                          <span className="bg-emerald-600 text-white text-[7px] font-mono px-1 py-0.1 rounded uppercase">
-                            Đã Sở Hữu
+                          <span className="bg-emerald-800 text-emerald-100 text-[6px] font-mono px-1 py-0.2 rounded uppercase">
+                            Sở Hữu
                           </span>
                         )}
                       </span>
-                      <span className="text-[9.5px] text-amber-900/75 leading-tight font-sans">
+                      <span className="text-[9px] text-[#9a8d7e] leading-tight font-sans">
                         {item.desc}
                       </span>
-                      <span className="text-[8.5px] font-mono text-amber-800 font-bold mt-1 flex items-center gap-2">
-                        Giá: <span className="text-amber-950">🪨 {item.stoneCost}</span>
-                        {item.shellCost > 0 && <span className="text-amber-950">🐚 {item.shellCost}</span>}
+                      <span className="text-[8px] font-mono text-[#d4943a] mt-1 flex items-center gap-2">
+                        Giá: <span>🪨 {item.stoneCost}</span>
+                        {item.shellCost > 0 && <span>🐚 {item.shellCost}</span>}
                       </span>
                     </div>
                   </div>
@@ -544,15 +520,15 @@ export default function KrogCrusher({
                   <button
                     onClick={() => handleBuy(item.id, item.stoneCost, item.shellCost)}
                     disabled={isPurchased}
-                    className={`px-2.5 py-1.5 rounded-lg font-mono text-[9.5px] font-bold shrink-0 cursor-pointer transition-all ${
+                    className={`px-2 py-1 rounded-lg font-mono text-[9px] font-bold shrink-0 cursor-pointer transition-all ${
                       isPurchased
-                        ? 'bg-amber-100 text-amber-950/30 border-none cursor-not-allowed'
+                        ? 'bg-[#1c1915] text-[#9a8d7e]/30 cursor-not-allowed'
                         : canAfford
-                        ? 'bg-orange-850 hover:bg-orange-950 text-white border border-transparent'
-                        : 'bg-amber-200/55 text-amber-900/50 cursor-pointer hover:bg-amber-200'
+                        ? 'bg-[#d4943a] text-[#0c0a08] hover:bg-[#e8a838]'
+                        : 'bg-[#1c1915] text-[#9a8d7e]/40 hover:bg-[#1c1915]/80'
                     }`}
                   >
-                    {isPurchased ? 'Sở hữu' : 'Đổi ngay'}
+                    {isPurchased ? 'Có rồi' : 'Đổi'}
                   </button>
                 </div>
               );
@@ -561,17 +537,17 @@ export default function KrogCrusher({
         </div>
       )}
 
-      {/* Hammer/Axe selection buttons */}
-      <div className="flex items-center justify-between mt-1.5 border-t border-amber-950/10 pt-2.5">
+      {/* Footer Controls */}
+      <div className="flex items-center justify-between mt-1 border-t border-[#d4943a]/8 pt-2">
         <button
           onClick={handleResetPocket}
-          className="text-[9.5px] font-mono px-2.5 py-1 rounded bg-[#e8e3d5] border border-amber-950/15 text-amber-900 cursor-pointer hover:bg-red-100 hover:text-red-950 duration-150"
+          className="text-[8.5px] font-mono px-2 py-1 rounded bg-[#151210] border border-[#d4943a]/12 text-[#9a8d7e] cursor-pointer hover:bg-red-950 hover:text-red-300 transition-colors"
         >
           Để Đá Lại Rừng 🏔️
         </button>
 
-        <span className="font-mono text-[9px] italic text-[#80766a] flex items-center">
-          <Sparkles className="w-3.5 h-3.5 mr-1 text-orange-600 fill-orange-500 animate-pulse" /> Đã sắm {purchasedIds.length}/{shopItems.length} bảo bối
+        <span className="font-mono text-[8px] italic text-[#5c5247] flex items-center">
+          <Sparkles className="w-3.5 h-3.5 mr-1 text-[#d4943a] fill-[#d4943a]/30 animate-pulse" /> Đã sắm {purchasedIds.length}/{shopItems.length} bảo bối
         </span>
       </div>
     </div>
